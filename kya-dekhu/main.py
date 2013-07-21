@@ -14,14 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import webapp2
-import authentication
 
+import os
+import webapp2
+import jinja2
+import authentication
+from django.template.loader import render_to_string
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'])
+	
 class MainHandler(webapp2.RequestHandler):
   def get(self):
     try:
       if authentication.has_access('EDITOR'):
-        self.response.write('Hello world!')
+        template = JINJA_ENVIRONMENT.get_template('templates/default/edit_movie.html')
+        self.response.write(template.render())
+
       else:
         self.response.write('No Access')
     except authentication.NotLoggedInException as e:
